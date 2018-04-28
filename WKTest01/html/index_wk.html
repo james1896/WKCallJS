@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0, user-scalable=no,minimum-scale=1.0,maximum-scale=1.0">
+</head>
+<body>
+    <h4 id="messageView"></h4>
+    <input id="usernameText" type="text" placeholder="Username"> <br>
+    <button id="saveButton" type="button">保存到缓存</button> <br>
+    <button id="getButton" type="button">从缓存中获取</button> <br>
+    <div>缓存中的Username:<span id="usernameView"></span></div>
+</body>
+<script>
+;(function (w) {
+    var messageView = document.getElementById("messageView"),
+        usernameText = document.getElementById("usernameText"),
+        usernameView = document.getElementById("usernameView"),
+        saveButton = document.getElementById("saveButton"),
+        getButton = document.getElementById("getButton");
+
+    function appInvoke(params) {
+        if(!window.webkit) {
+            return false;
+        }
+
+        if(!window.webkit.messageHandlers) {
+            return false;
+        }
+
+        if(!window.webkit.messageHandlers.appInvoke) {
+            return false;
+        }
+
+        return window.webkit.messageHandlers.appInvoke.postMessage(params);
+    }
+
+    saveButton.addEventListener("click", function () {
+        appInvoke({
+            requestId: "1",
+            service: "cache",
+            method: "save",
+            data: {
+                key: "username",
+                value: JSON.stringify({cacheValue: usernameText.value}),
+                expire: 1
+            }
+        })
+    });
+
+    getButton.addEventListener("click", function () {
+        var username = appInvoke({
+            requestId: "2",
+            service: "cache",
+            method: "get",
+            data: {
+                key: "username"
+            }
+        });
+
+        usernameView.innerHTML = username;
+    });
+
+    
+    
+})(window);
+</script>
+</html>
